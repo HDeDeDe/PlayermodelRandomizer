@@ -10,37 +10,8 @@ local function tablelength(T)
   return count
 end
 
+--------------------------------------------------------------------------------
 local errorDisplayed = false
-
-
-if SERVER then
-
-CreateConVar("sv_playermodel_random_favorite_on_death", "1", {FCVAR_ARCHIVE, FCVAR_NOTIFY}, "Should playermodel randomization be allowed to occur.")
-
-util.AddNetworkString("model_rand_death_happened")
-
-hook.Add("PostPlayerDeath", "model_rand_death_hookMeBaybee", function (ply)
-    if !ConVarExists("sv_playermodel_selector_force") then
-        if !errorDisplayed then
-            errorDisplayed = true
-            error("Enhanced PlayerModel Selector or a variant is not installed. Please install Enhanced PlayerModel Selector or a variant to use this mod.")    
-        end
-        return
-    end
-
-    if !GetConVar("sv_playermodel_random_favorite_on_death"):GetBool() then
-        return
-    end
-
-    net.Start("model_rand_death_happened")
-    net.WritePlayer(ply)
-    net.Send(ply)
-end )
-
-end
-
-
-if CLIENT then
 
 CreateClientConVar( "cl_playermodel_random_favorite_on_death", "0", true, false)
 CreateClientConVar( "cl_playermodel_random_favorite_on_death_unique", "0", true, false)
@@ -134,5 +105,3 @@ hook.Add("PopulateToolMenu", "RandomizePlayermodelSettings", function ()
         panel:CheckBox("Force unique model", "cl_playermodel_random_favorite_on_death_unique")
     end)
 end)
-
-end
