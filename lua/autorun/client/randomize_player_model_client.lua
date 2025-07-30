@@ -1,9 +1,9 @@
-local error = error
 local print = function (s)
     return
 end
 local istable = istable
-local ConVarExists = ConVarExists
+local GetConVar = GetConVar
+local RunConsoleCommand = RunConsoleCommand
 local function tablelength(T)
   local count = 0
   for _ in pairs(T) do count = count + 1 end
@@ -11,22 +11,11 @@ local function tablelength(T)
 end
 
 --------------------------------------------------------------------------------
-local errorDisplayed = false
-
-CreateClientConVar( "cl_playermodel_random_favorite_on_death", "0", true, false)
-CreateClientConVar( "cl_playermodel_random_favorite_on_death_unique", "0", true, false)
-
+local borked = false
 local lastKnownLength = 0
 local usedNumbers = {}
 
 local function SelectFavorite()
-    if !ConVarExists("cl_playermodel_selector_force") then
-        if !errorDisplayed then
-            errorDisplayed = true
-            error("Enhanced PlayerModel Selector or a variant is not installed. Please install Enhanced PlayerModel Selector or a variant to use this mod.")    
-        end
-        return
-    end
     if !GetConVar("cl_playermodel_random_favorite_on_death"):GetBool() then
         return
     end
@@ -85,23 +74,38 @@ local function SelectFavorite()
     favorites = nil
 end
 
-net.Receive("model_rand_death_happened", function (len, _)
-    local localPly = LocalPlayer()
-    local ply = net.ReadPlayer()
-    if ply:IsValid() and ply:IsPlayer() and ply == localPly then
-        SelectFavorite()
-    end
-end)
+local function CreateClientsideHooks()
+    CreateClientConVar( "cl_playermodel_random_favorite_on_death", "0", true, false)
+    CreateClientConVar( "cl_playermodel_random_favorite_on_death_unique", "0", true, false)
+    
+    net.Receive("model_rand_death_happened", function (len, _)
+        if borked then
+            return
+        end
+        local localPly = LocalPlayer()
+        local ply = net.ReadPlayer()
+        if ply:IsValid() and ply:IsPlayer() and ply == localPly then
+            SelectFavorite()
+        end
+    end)
+    
+    hook.Add("PopulateToolMenu", "RandomizePlayermodelSettings", function ()
+        spawnmenu.AddToolMenuOption( "Options", "Randomize Playermodel", "plr_rand_options_server", "#Server", "", "", function ( panel )
+            panel:CheckBox("Allow randomization", "sv_playermodel_random_favorite_on_death")
+        end)
+        spawnmenu.AddToolMenuOption( "Options", "Randomize Playermodel", "plr_rand_options_client", "#Client", "", "", function ( panel )
+            panel:CheckBox("Randomize on death", "cl_playermodel_random_favorite_on_death")
+            panel:CheckBox("Force unique model", "cl_playermodel_random_favorite_on_death_unique")
+        end)
+    end)
+end
 
-hook.Add("PopulateToolMenu", "RandomizePlayermodelSettings", function ()
+CreateClientsideHooks()
+
+hook.Add("Initialize", "playermodel_randomizer_check_for_req_client", function ()
     if !ConVarExists("cl_playermodel_selector_force") then
-        return
+        borked = true
+        error("Enhanced PlayerModel Selector or a variant is not installed. Please install Enhanced PlayerModel Selector or a variant to use this mod.")
     end
-    spawnmenu.AddToolMenuOption( "Options", "Randomize Playermodel", "plr_rand_options_server", "#Server", "", "", function ( panel )
-        panel:CheckBox("Allow randomization", "sv_playermodel_random_favorite_on_death")
-    end)
-    spawnmenu.AddToolMenuOption( "Options", "Randomize Playermodel", "plr_rand_options_client", "#Client", "", "", function ( panel )
-        panel:CheckBox("Randomize on death", "cl_playermodel_random_favorite_on_death")
-        panel:CheckBox("Force unique model", "cl_playermodel_random_favorite_on_death_unique")
-    end)
+    borked = false 
 end)
