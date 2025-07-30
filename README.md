@@ -1,3 +1,4 @@
+![icon](https://images.steamusercontent.com/ugc/14875715786643823390/16E3C1B896BC0AFA15A5F2EB671678C00CAD8ECC/?imw=268&imh=268&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true)
 ## Randomize playermodel when you die.
 Pulls the random player model from your favorites list.
 Doesn't work without Enhanced Playermodel Selector or a variant of it.
