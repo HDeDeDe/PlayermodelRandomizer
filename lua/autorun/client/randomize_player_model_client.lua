@@ -38,14 +38,20 @@ local function GetRandomModel( targetLength )
             usedNumbers = {}
             usedLength = 0
         end
-        for i=1, usedLength do
-            if usedLength == 0 then
-                break
+        local itterations = 0
+        local count = 1
+        while count <= usedLength do
+            if itterations >= 1000 then
+                ErrorNoHalt("[Playermodel Randomizer] Exceeded itteration limit, ignoring unique list. \n")
+                return randomNumber
             end
-            if randomNumber == usedNumbers[i] then
-                randomNumber = math.random(length)
-                i = 1
+            if randomNumber == usedNumbers[count] then
+                print("Reroll " .. randomNumber)
+                randomNumber = math.random(targetLength)
+                count = 1
             end
+            count = count + 1
+            itterations = itterations + 1
         end
         usedNumbers[usedLength + 1] = randomNumber
         print("Length of list: " .. usedLength + 1)
@@ -128,7 +134,7 @@ local function CreateClientsideHooks()
     CreateClientConVar( "cl_playermodel_random_on_death", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_favorite", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_unique", "0", true, false)
-    concommand.Add("cl_playermodel_random_debug_toggle", ToggleDebugging, nil, nil, FCVAR_CHEAT)
+    concommand.Add("cl_playermodel_random_debug_toggle", ToggleDebugging, nil, nil, {FCVAR_CHEAT})
     
     net.Receive("model_rand_death_happened", function (len, _)
         if borked then
