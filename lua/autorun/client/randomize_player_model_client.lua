@@ -17,8 +17,8 @@ local usedNumbers = {}
 local modelsLength = 0
 local models = {}
 
-local function ForceUnique( num, targetLength )
-    local randomNumber = num
+local function GetRandomModel( targetLength )
+    local randomNumber = math.random(targetLength)
     if GetConVar("cl_playermodel_random_unique"):GetBool() then
         local usedLength = tablelength(usedNumbers)
         if usedLength == targetLength then
@@ -78,7 +78,7 @@ local function SelectFavorite()
             usedNumbers = {}
         end
 
-        local randomNumber = ForceUnique(math.random(length), length)
+        local randomNumber = GetRandomModel(length)
         --print(favorites[randomNumber])
         RunConsoleCommand("playermodel_loadfav", favorites[randomNumber])
     end
@@ -104,7 +104,7 @@ local function SelectRandom(player)
         local usedNumbers = {}
     end
 
-    local randomNumber = ForceUnique(math.random(modelsLength), modelsLength)
+    local randomNumber = GetRandomModel(modelsLength)
     
     --print(models[randomNumber])
     RunConsoleCommand("cl_playermodel", models[randomNumber])
