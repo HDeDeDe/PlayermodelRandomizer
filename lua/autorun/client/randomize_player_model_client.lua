@@ -43,6 +43,15 @@ local function ForceUnique( num, targetLength )
     return randomNumber
 end
 
+local function CheckForValidModels()
+    local modelsTemp = player_manager.AllValidModels()
+    modelsLength = 0
+    for k, v in pairs(modelsTemp) do
+        modelsLength = modelsLength + 1
+        models[modelsLength] = k
+    end
+end
+
 
 local function SelectFavorite()
     local favorites = {}
@@ -87,17 +96,19 @@ local function SelectRandom(player)
         return 
     end
 
-    local randomNumber = math.random(modelsLength)
-
-    if GetConVar("cl_playermodel_random_unique"):GetBool() then
-        if lastKnownLength ~= 0 then
-            local lastKnownLength = 0
-            local usedNumbers = {}
-        end
-        
-        ForceUnique(randomNumber, modelsLength)
+    if lastKnownLength ~= 0 then
+        local lastKnownLength = 0
+        local usedNumbers = {}
     end
 
+    local randomNumber = math.random(modelsLength)
+
+    if !istable(models) or modelsLength == 0 then
+        CheckForValidModels()
+    end
+    ForceUnique(randomNumber, modelsLength)
+    
+    --print(models[randomNumber])
     RunConsoleCommand("cl_playermodel", models[randomNumber])
     RunConsoleCommand("playermodel_apply")
 end
@@ -138,10 +149,5 @@ hook.Add("Initialize", "playermodel_randomizer_check_for_req_client", function (
         error("Enhanced PlayerModel Selector or a variant is not installed. Please install Enhanced PlayerModel Selector or a variant to use this mod.")
     end
     borked = false 
-    local modelsTemp = player_manager.AllValidModels()
-    modelsLength = 0
-    for k, v in pairs(modelsTemp) do
-        modelsLength = modelsLength + 1
-        models[modelsLength] = k
-    end
+    CheckForValidModels()
 end)
