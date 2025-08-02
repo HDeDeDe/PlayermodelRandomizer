@@ -1,6 +1,8 @@
-local print = function (s)
+local printDebug = print
+local printRelease = function (s)
     return
 end
+local print = printRelease
 local istable = istable
 local GetConVar = GetConVar
 local RunConsoleCommand = RunConsoleCommand
@@ -16,6 +18,17 @@ local lastKnownLength = 0
 local usedNumbers = {}
 local modelsLength = 0
 local models = {}
+local debugging = false 
+
+local function ToggleDebugging()
+    if debugging then
+        print = printRelease
+        debugging = false 
+        return 
+    end
+    print = printDebug
+    debugging = true
+end
 
 local function GetRandomModel( targetLength )
     local randomNumber = math.random(targetLength)
@@ -35,10 +48,10 @@ local function GetRandomModel( targetLength )
             end
         end
         usedNumbers[usedLength + 1] = randomNumber
-        -- print("Length of list: " .. usedLength + 1)
-        -- for k, v in pairs(usedNumbers) do
-        --     print(usedNumbers[k])
-        -- end
+        print("Length of list: " .. usedLength + 1)
+        for k, v in pairs(usedNumbers) do
+            print(usedNumbers[k])
+        end
     end
     return randomNumber
 end
@@ -57,14 +70,14 @@ local function SelectFavorite()
     local favorites = {}
     
     if file.Exists("lf_playermodel_selector/cl_favorites.txt", "DATA") then
-        --print("Found favorites")
+        print("Found favorites")
         local loaded = util.JSONToTable(file.Read("lf_playermodel_selector/cl_favorites.txt", "DATA"))
         if istable(loaded) then
-            --print("Favorites loaded")
+            print("Favorites loaded")
             local count = 1
             for k, v in pairs(loaded) do
                 favorites[count] = tostring(k)
-                --print(favorites[count])
+                print(favorites[count])
                 count = count + 1
             end
             loaded = nil
@@ -79,7 +92,7 @@ local function SelectFavorite()
         end
 
         local randomNumber = GetRandomModel(length)
-        --print(favorites[randomNumber])
+        print(favorites[randomNumber])
         RunConsoleCommand("playermodel_loadfav", favorites[randomNumber])
     end
     
@@ -106,7 +119,7 @@ local function SelectRandom(player)
 
     local randomNumber = GetRandomModel(modelsLength)
     
-    --print(models[randomNumber])
+    print(models[randomNumber])
     RunConsoleCommand("cl_playermodel", models[randomNumber])
     RunConsoleCommand("playermodel_apply")
 end
@@ -115,6 +128,7 @@ local function CreateClientsideHooks()
     CreateClientConVar( "cl_playermodel_random_on_death", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_favorite", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_unique", "0", true, false)
+    concommand.Add("cl_playermodel_random_debug_toggle", ToggleDebugging, nil, nil, FCVAR_CHEAT)
     
     net.Receive("model_rand_death_happened", function (len, _)
         if borked then
