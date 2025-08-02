@@ -45,10 +45,6 @@ end
 
 
 local function SelectFavorite()
-    if !GetConVar("cl_playermodel_random_favorite_on_death"):GetBool() then
-        return
-    end
-    
     local favorites = {}
     
     if file.Exists("lf_playermodel_selector/cl_favorites.txt", "DATA") then
@@ -72,6 +68,7 @@ local function SelectFavorite()
             lastKnownLength = length
             usedNumbers = {}
         end
+
         local randomNumber = math.random(length)
         ForceUnique(randomNumber, length)
 
@@ -79,6 +76,30 @@ local function SelectFavorite()
     end
     
     favorites = nil
+end
+
+local function SelectRandom(player)
+    if !GetConVar("cl_playermodel_random_on_death"):GetBool() then
+        return 
+    end
+    if GetConVar("cl_playermodel_random_favorite"):GetBool() then
+        SelectFavorite()
+        return 
+    end
+
+    local randomNumber = math.random(modelsLength)
+
+    if GetConVar("cl_playermodel_random_unique"):GetBool() then
+        if lastKnownLength ~= 0 then
+            local lastKnownLength = 0
+            local usedNumbers = {}
+        end
+        
+        ForceUnique(randomNumber, modelsLength)
+    end
+
+    RunConsoleCommand("cl_playermodel", models[randomNumber])
+    RunConsoleCommand("playermodel_apply")
 end
 
 local function CreateClientsideHooks()
@@ -93,7 +114,7 @@ local function CreateClientsideHooks()
         local localPly = LocalPlayer()
         local ply = net.ReadPlayer()
         if ply:IsValid() and ply:IsPlayer() and ply == localPly then
-            SelectFavorite()
+            SelectRandom(ply)
         end
     end)
     
@@ -117,4 +138,10 @@ hook.Add("Initialize", "playermodel_randomizer_check_for_req_client", function (
         error("Enhanced PlayerModel Selector or a variant is not installed. Please install Enhanced PlayerModel Selector or a variant to use this mod.")
     end
     borked = false 
+    local modelsTemp = player_manager.AllValidModels()
+    modelsLength = 0
+    for k, v in pairs(modelsTemp) do
+        modelsLength = modelsLength + 1
+        models[modelsLength] = k
+    end
 end)
