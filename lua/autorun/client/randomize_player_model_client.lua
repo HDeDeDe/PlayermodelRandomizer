@@ -14,6 +14,35 @@ end
 local borked = false
 local lastKnownLength = 0
 local usedNumbers = {}
+local modelsLength = 0
+local models = {}
+
+local function ForceUnique( num, targetLength )
+    local randomNumber = num
+    if GetConVar("cl_playermodel_random_unique"):GetBool() then
+        local usedLength = tablelength(usedNumbers)
+        if usedLength == targetLength then
+            usedNumbers = {}
+            usedLength = 0
+        end
+        for i=1, usedLength do
+            if usedLength == 0 then
+                break
+            end
+            if randomNumber == usedNumbers[i] then
+                randomNumber = math.random(length)
+                i = 1
+            end
+        end
+        usedNumbers[usedLength + 1] = randomNumber
+        -- print("Length of list: " .. usedLength + 1)
+        -- for k, v in pairs(usedNumbers) do
+        --     print(usedNumbers[k])
+        -- end
+    end
+    return randomNumber
+end
+
 
 local function SelectFavorite()
     if !GetConVar("cl_playermodel_random_favorite_on_death"):GetBool() then
@@ -44,29 +73,7 @@ local function SelectFavorite()
             usedNumbers = {}
         end
         local randomNumber = math.random(length)
-        --print("Me random skin: ".. favorites[randomNumber])
-
-        if GetConVar("cl_playermodel_random_unique"):GetBool() then
-            local usedLength = tablelength(usedNumbers)
-            if usedLength == length then
-                usedNumbers = {}
-                usedLength = 0
-            end
-            for i=1, usedLength do
-                if usedLength == 0 then
-                    break
-                end
-                if randomNumber == usedNumbers[i] then
-                    randomNumber = math.random(length)
-                    i = 1
-                end
-            end
-            usedNumbers[usedLength + 1] = randomNumber
-            -- print("Length of list: " .. usedLength + 1)
-            -- for k, v in pairs(usedNumbers) do
-            --     print(usedNumbers[k])
-            -- end
-        end
+        ForceUnique(randomNumber, length)
 
         RunConsoleCommand("playermodel_loadfav", favorites[randomNumber])
     end
