@@ -4,7 +4,7 @@ local GetConVar = GetConVar
 local borked = false
 
 local function AddServersideHooks()
-    CreateConVar("sv_playermodel_random_favorite_on_death", "1", {FCVAR_ARCHIVE, FCVAR_NOTIFY}, "Should playermodel randomization be allowed to occur.")
+    CreateConVar("sv_playermodel_allow_random_on_death", "1", {FCVAR_ARCHIVE, FCVAR_NOTIFY}, "Should playermodel randomization be allowed to occur.")
 
     util.AddNetworkString("model_rand_death_happened")
 
@@ -12,7 +12,7 @@ local function AddServersideHooks()
         if borked then
             return 
         end
-        if !GetConVar("sv_playermodel_random_favorite_on_death"):GetBool() then
+        if !GetConVar("sv_playermodel_allow_random_on_death"):GetBool() then
             return
         end
 
