@@ -46,7 +46,7 @@ local function SelectFavorite()
         local randomNumber = math.random(length)
         --print("Me random skin: ".. favorites[randomNumber])
 
-        if GetConVar("cl_playermodel_random_favorite_on_death_unique"):GetBool() then
+        if GetConVar("cl_playermodel_random_unique"):GetBool() then
             local usedLength = tablelength(usedNumbers)
             if usedLength == length then
                 usedNumbers = {}
@@ -75,8 +75,9 @@ local function SelectFavorite()
 end
 
 local function CreateClientsideHooks()
-    CreateClientConVar( "cl_playermodel_random_favorite_on_death", "0", true, false)
-    CreateClientConVar( "cl_playermodel_random_favorite_on_death_unique", "0", true, false)
+    CreateClientConVar( "cl_playermodel_random_on_death", "0", true, false)
+    CreateClientConVar( "cl_playermodel_random_favorite", "0", true, false)
+    CreateClientConVar( "cl_playermodel_random_unique", "0", true, false)
     
     net.Receive("model_rand_death_happened", function (len, _)
         if borked then
@@ -94,8 +95,9 @@ local function CreateClientsideHooks()
             panel:CheckBox("Allow randomization", "sv_playermodel_random_favorite_on_death")
         end)
         spawnmenu.AddToolMenuOption( "Options", "Randomize Playermodel", "plr_rand_options_client", "#Client", "", "", function ( panel )
-            panel:CheckBox("Randomize on death", "cl_playermodel_random_favorite_on_death")
-            panel:CheckBox("Force unique model", "cl_playermodel_random_favorite_on_death_unique")
+            panel:CheckBox("Randomize on death", "cl_playermodel_random_on_death")
+            panel:CheckBox("Pick from favorites", "cl_playermodel_random_favorite")
+            panel:CheckBox("Force unique model", "cl_playermodel_random_unique")
         end)
     end)
 end
