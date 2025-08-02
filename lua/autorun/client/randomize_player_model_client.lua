@@ -78,9 +78,8 @@ local function SelectFavorite()
             usedNumbers = {}
         end
 
-        local randomNumber = math.random(length)
-        ForceUnique(randomNumber, length)
-
+        local randomNumber = ForceUnique(math.random(length), length)
+        --print(favorites[randomNumber])
         RunConsoleCommand("playermodel_loadfav", favorites[randomNumber])
     end
     
@@ -95,18 +94,17 @@ local function SelectRandom(player)
         SelectFavorite()
         return 
     end
+    
+    if !istable(models) or modelsLength == 0 then
+        CheckForValidModels()
+    end
 
     if lastKnownLength ~= 0 then
         local lastKnownLength = 0
         local usedNumbers = {}
     end
 
-    local randomNumber = math.random(modelsLength)
-
-    if !istable(models) or modelsLength == 0 then
-        CheckForValidModels()
-    end
-    ForceUnique(randomNumber, modelsLength)
+    local randomNumber = ForceUnique(math.random(modelsLength), modelsLength)
     
     --print(models[randomNumber])
     RunConsoleCommand("cl_playermodel", models[randomNumber])
