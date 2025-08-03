@@ -39,12 +39,12 @@ local function GetRandomModel( targetLength )
             usedLength = 0
         end
         local itterations = 0
-        local itterationLimit = GetConVar("cl_playermodel_random_itteration_limit"):GetInt()
-        local count = 1
-
-        if itterationLimit =< 0 then
-            itterationLimit = 1000
+        local itterationCvar = GetConVar("cl_playermodel_random_itteration_limit")
+        if itterationCvar:GetInt() =< 0 then
+            itterationCvar:SetInt(1000)
         end
+        local itterationLimit = itterationCvar:GetInt()
+        local count = 1
 
         while count <= usedLength do
             if itterations > itterationLimit then
