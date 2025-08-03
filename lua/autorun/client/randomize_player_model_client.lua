@@ -39,9 +39,15 @@ local function GetRandomModel( targetLength )
             usedLength = 0
         end
         local itterations = 0
+        local itterationLimit = GetConVar("cl_playermodel_random_itteration_limit"):GetInt()
         local count = 1
+
+        if itterationLimit =< 0 then
+            itterationLimit = 1000
+        end
+
         while count <= usedLength do
-            if itterations >= 1000 then
+            if itterations > itterationLimit then
                 ErrorNoHalt("[Playermodel Randomizer] Exceeded itteration limit, ignoring unique list. \n")
                 return randomNumber
             end
@@ -134,6 +140,7 @@ local function CreateClientsideHooks()
     CreateClientConVar( "cl_playermodel_random_on_death", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_favorite", "0", true, false)
     CreateClientConVar( "cl_playermodel_random_unique", "0", true, false)
+    CreateClientConVar( "cl_playermodel_random_itteration_limit", "1000", true, false)
     concommand.Add("cl_playermodel_random_debug_toggle", ToggleDebugging, nil, nil, {FCVAR_CHEAT})
     
     net.Receive("model_rand_death_happened", function (len, _)
