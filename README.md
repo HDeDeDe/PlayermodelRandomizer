@@ -1,4 +1,4 @@
-![icon](https://images.steamusercontent.com/ugc/14875715786643823390/16E3C1B896BC0AFA15A5F2EB671678C00CAD8ECC/?imw=268&imh=268&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true)
+![icon](https://raw.githubusercontent.com/HDeDeDe/PlayermodelRandomizer/refs/heads/main/addon.gif)
 ## Randomize playermodel when you die.
 Optionally pulls the random player model from your favorites list.
 
